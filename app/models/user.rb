@@ -2,6 +2,7 @@ class User < ActiveRecord::Base
 
   before_save { self.email = email.downcase }
   before_create :create_remember_token
+  before_action :admin_user,     only: :destroy
 
   validates :name, presence: true, :length => {:maximum => 50}
 
@@ -28,6 +29,10 @@ class User < ActiveRecord::Base
 
   def create_remember_token
     self.remember_token = User.encrypt(User.new_remember_token)
+  end
+
+  def admin_user
+    redirect_to(root_url) unless current_user.admin?
   end
 
 end
